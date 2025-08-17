@@ -1,0 +1,25 @@
+{
+  "name": "hr-platform-mock",
+  "version": "1.0.0",
+  "description": "Mock HR Platform Server for testing Recruitsy integration",
+  "main": "hr-platform-mock.js",
+  "scripts": {
+    "start": "node hr-platform-mock.js",
+    "dev": "nodemon hr-platform-mock.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "hr-platform",
+    "mock-server",
+    "recruitsy",
+    "testing"
+  ],
+  "author": "Recruitsy Team",
+  "license": "MIT"
+}
