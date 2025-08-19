@@ -38,3 +38,11 @@ Route::middleware('auth:web')->group(function () {
     Route::delete('/profile/resume/{id}', [App\Http\Controllers\ProfileController::class, 'deleteResume']);
     Route::put('/profile/resume/{id}/primary', [App\Http\Controllers\ProfileController::class, 'setPrimaryResume']);
 });
+
+// Job alerts routes
+Route::middleware('auth:web')->group(function () {
+    Route::get('/job-alerts', [App\Http\Controllers\JobAlertController::class, 'index']);
+    Route::post('/job-alerts', [App\Http\Controllers\JobAlertController::class, 'store']);
+    Route::put('/job-alerts/{id}', [App\Http\Controllers\JobAlertController::class, 'update']);
+    Route::delete('/job-alerts/{id}', [App\Http\Controllers\JobAlertController::class, 'destroy']);
+});

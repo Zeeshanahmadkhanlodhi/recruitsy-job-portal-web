@@ -143,7 +143,7 @@
                     </div>
                                                     <div class="job-actions">
                                     <a href="{{ route('dashboard-jobs.detail', $job->id) }}" class="btn btn-outline btn-sm">View Details</a>
-                                    <button class="btn btn-primary btn-sm" onclick="openApplicationModal({{ $job->id }}, '{{ $job->title }}', '{{ $job->company->name ?? 'Company Not Specified' }}')">Apply Now</button>
+                                    <button class="btn btn-primary btn-sm" onclick="applyToJob({{ $job->id }}, this)" id="applyBtn{{ $job->id }}">Apply Now</button>
                                 </div>
                 </div>
             @endforeach
@@ -482,6 +482,116 @@
 .btn-save:hover { color: #374151; }
 .btn-save.active, .btn-save.active i { color: #2563eb; }
 
+/* Button Success State */
+.btn-success {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    border-color: #059669;
+}
+
+.btn-success:disabled {
+    background: #10b981;
+    border-color: #10b981;
+    opacity: 0.7;
+}
+
+/* Button Warning State */
+.btn-warning {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #d97706;
+    border-color: #d97706;
+}
+
+.btn-warning:disabled {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    opacity: 0.7;
+}
+
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease-out;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.notification-message {
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: inherit;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.notification-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.notification-success {
+    background: #10b981;
+    color: white;
+}
+
+.notification-error {
+    background: #ef4444;
+    color: white;
+}
+
+.notification-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.notification-info {
+    background: #3b82f6;
+    color: white;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
 /* Button styles are now handled by the main CSS file */
 
 .job-description {
@@ -771,263 +881,145 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script> -->
 
-<!-- Application Modal -->
-<div id="applicationModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title" id="modalJobTitle">Apply for Job</h2>
-            <button class="close" onclick="closeApplicationModal()">&times;</button>
-        </div>
-        
-        <div id="modalBody">
-            <div id="applicationForm">
-                <div class="form-group">
-                    <label for="candidate_name" class="form-label">Full Name *</label>
-                    <input type="text" id="candidate_name" name="candidate_name" class="form-input" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="candidate_email" class="form-label">Email Address *</label>
-                    <input type="email" id="candidate_email" name="candidate_email" class="form-input" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="candidate_phone" class="form-label">Phone Number</label>
-                    <input type="tel" id="candidate_phone" name="candidate_phone" class="form-input">
-                </div>
-                
-                <div class="form-group">
-                    <label for="resume_url" class="form-label">Resume/CV URL</label>
-                    <input type="url" id="resume_url" name="resume_url" class="form-input" placeholder="https://example.com/resume.pdf">
-                </div>
-                
-                <div class="form-group">
-                    <label for="cover_letter" class="form-label">Cover Letter</label>
-                    <textarea id="cover_letter" name="cover_letter" class="form-textarea form-input" placeholder="Tell us why you're interested in this position..."></textarea>
-                </div>
-                
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-outline" onclick="closeApplicationModal()">Cancel</button>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="submitApplication()">Submit Application</button>
-                </div>
-            </div>
-            
-            <div id="applicationSuccess" style="display: none;">
-                <div class="alert alert-success">
-                    <h3>Application Submitted Successfully!</h3>
-                    <p>Thank you for your interest. We've received your application and will forward it to the company. You'll receive a confirmation email shortly.</p>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="closeApplicationModal()">Close</button>
-                </div>
-            </div>
-            
-            <div id="applicationError" style="display: none;">
-                <div class="alert alert-error">
-                    <h3>Application Submission Failed</h3>
-                    <p id="errorMessage">An error occurred while submitting your application. Please try again.</p>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-outline" onclick="closeApplicationModal()">Close</button>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="showApplicationForm()">Try Again</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <style>
-/* Application Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-}
 
-.modal-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 2rem;
-    border-radius: 0.75rem;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.modal-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1f2937;
-}
-
-.close {
-    color: #9ca3af;
-    font-size: 1.5rem;
-    font-weight: bold;
-    cursor: pointer;
-    background: none;
-    border: none;
-}
-
-.close:hover {
-    color: #374151;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #374151;
-}
-
-.form-input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.form-textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e5e7eb;
-}
-
-.alert {
-    padding: 1rem;
-    border-radius: 0.375rem;
-    margin-bottom: 1rem;
-}
-
-.alert-success {
-    background-color: #dcfce7;
-    color: #16a34a;
-    border: 1px solid #bbf7d0;
-}
-
-.alert-error {
-    background-color: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-}
-
-.alert-info {
-    background-color: #dbeafe;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
-}
 </style>
 
 <script>
-let currentJobId = null;
-
-function openApplicationModal(jobId, jobTitle, companyName) {
-    currentJobId = jobId;
-    document.getElementById('modalJobTitle').textContent = `Apply for ${jobTitle} at ${companyName}`;
-    document.getElementById('applicationModal').style.display = 'block';
-    showApplicationForm();
-}
-
-function closeApplicationModal() {
-    document.getElementById('applicationModal').style.display = 'none';
-    currentJobId = null;
-}
-
-function showApplicationForm() {
-    document.getElementById('applicationForm').style.display = 'block';
-    document.getElementById('applicationSuccess').style.display = 'none';
-    document.getElementById('applicationError').style.display = 'none';
-}
-
-function submitApplication() {
-    const formData = {
-        candidate_name: document.getElementById('candidate_name').value,
-        candidate_email: document.getElementById('candidate_email').value,
-        candidate_phone: document.getElementById('candidate_phone').value,
-        resume_url: document.getElementById('resume_url').value,
-        cover_letter: document.getElementById('cover_letter').value,
-    };
-
-    // Basic validation
-    if (!formData.candidate_name || !formData.candidate_email) {
-        alert('Please fill in all required fields.');
-        return;
-    }
-
+function applyToJob(jobId, buttonElement) {
     // Show loading state
-    const submitBtn = document.querySelector('#applicationForm .btn-primary');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Submitting...';
-    submitBtn.disabled = true;
-
-    fetch(`/api/jobs/${currentJobId}/apply`, {
+    buttonElement.disabled = true;
+    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Applying...';
+    
+    // Prepare application data with user's profile information
+    const applicationData = {
+        job_id: jobId,
+        // Provide required schema fields so backend can save application
+        candidate_name: @json(auth()->user()->full_name ?? auth()->user()->name ?? ''),
+        candidate_email: @json(auth()->user()->email ?? ''),
+        candidate_phone: @json(auth()->user()->phone ?? ''),
+        resume_url: @json(optional(auth()->user()->primaryResume)->file_path ?? ''),
+        cover_letter: '', // Optional cover letter - can be enhanced later
+        user_profile: {
+            skills: {{ auth()->user()->skills->count() }},
+            experience: {{ auth()->user()->experience->count() }},
+            education: {{ auth()->user()->education->count() }},
+            resumes: {{ auth()->user()->resumes->count() }}
+        }
+    };
+    
+    // Send application directly to HR platform
+    fetch('/api/jobs/' + jobId + '/apply', {
         method: 'POST',
         headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(applicationData)
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('applicationForm').style.display = 'none';
-            document.getElementById('applicationSuccess').style.display = 'block';
+            // Show success message
+            showNotification('Application submitted successfully! Your profile has been sent to the HR team.', 'success');
+            
+            // Update button to show applied state
+            buttonElement.classList.remove('btn-primary');
+            buttonElement.classList.add('btn-success');
+            buttonElement.innerHTML = '<i class="fas fa-check mr-2"></i>Applied';
+            buttonElement.disabled = true;
         } else {
-            throw new Error(data.message || 'Application submission failed');
+            // Check if this is a forwarding failure that can be retried
+            if (data.application_id && data.message && data.message.includes('HR Platform')) {
+                showNotification('Application saved but failed to reach HR team. You can retry later.', 'warning');
+                
+                // Update button to show retry option
+                buttonElement.classList.remove('btn-primary');
+                buttonElement.classList.add('btn-warning');
+                buttonElement.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Retry';
+                buttonElement.onclick = () => retryApplication(data.application_id, buttonElement);
+            } else {
+                showNotification('Failed to submit application: ' + (data.message || 'Unknown error'), 'error');
+                
+                // Reset button
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = 'Apply Now';
+            }
         }
     })
     .catch(error => {
-        document.getElementById('errorMessage').textContent = error.message;
-        document.getElementById('applicationForm').style.display = 'none';
-        document.getElementById('applicationError').style.display = 'block';
-    })
-    .finally(() => {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
+        console.error('Application error:', error);
+        showNotification('An error occurred while submitting your application', 'error');
+        
+        // Reset button
+        buttonElement.disabled = false;
+        buttonElement.innerHTML = 'Apply Now';
     });
 }
 
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('applicationModal');
-    if (event.target === modal) {
-        closeApplicationModal();
-    }
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-message">${message}</span>
+            <button class="notification-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+        </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+function retryApplication(applicationId, buttonElement) {
+    // Show loading state
+    buttonElement.disabled = true;
+    buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Retrying...';
+    
+    // Send retry request
+    fetch('/api/applications/' + applicationId + '/retry', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Application retried successfully!', 'success');
+            
+            // Update button to show applied state
+            buttonElement.classList.remove('btn-warning');
+            buttonElement.classList.add('btn-success');
+            buttonElement.innerHTML = '<i class="fas fa-check mr-2"></i>Applied';
+            buttonElement.disabled = true;
+        } else {
+            showNotification('Retry failed: ' + (data.message || 'Unknown error'), 'error');
+            
+            // Reset button to retry again
+            buttonElement.disabled = false;
+            buttonElement.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Retry';
+        }
+    })
+    .catch(error => {
+        console.error('Retry error:', error);
+        showNotification('An error occurred while retrying the application', 'error');
+        
+        // Reset button
+        buttonElement.disabled = false;
+        buttonElement.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Retry';
+    });
 }
 </script>
 @endsection 

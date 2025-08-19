@@ -26,11 +26,15 @@ class Job extends Model
         'posted_at',
         'apply_url',
         'is_remote',
+        'is_active',
+        'expires_at',
     ];
 
     protected $casts = [
         'posted_at' => 'datetime',
+        'expires_at' => 'datetime',
         'is_remote' => 'boolean',
+        'is_active' => 'boolean',
         'salary_min' => 'decimal:2',
         'salary_max' => 'decimal:2',
     ];

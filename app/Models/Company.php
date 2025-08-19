@@ -11,14 +11,29 @@ class Company extends Model
 
     protected $fillable = [
         'name',
+        'description',
+        'location',
+        'industry',
+        'website',
         'hr_portal_url',
         'api_key',
         'api_secret',
+        'is_active',
+        'logo',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function jobs()
     {
         return $this->hasMany(Job::class, 'company_id');
+    }
+
+    public function applications()
+    {
+        return $this->hasManyThrough(Application::class, Job::class, 'company_id', 'job_id');
     }
 }
 

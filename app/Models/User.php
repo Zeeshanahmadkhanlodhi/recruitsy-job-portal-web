@@ -31,6 +31,8 @@ class User extends Authenticatable
         'github_url',
         'portfolio_url',
         'bio',
+        'is_active',
+        'last_login_at',
     ];
 
     /**
@@ -52,6 +54,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'date_of_birth' => 'date',
+        'is_active' => 'boolean',
+        'last_login_at' => 'datetime',
     ];
 
     public function applications()
@@ -62,6 +66,14 @@ class User extends Authenticatable
     public function savedJobs()
     {
         return $this->hasMany(SavedJob::class);
+    }
+
+    /**
+     * Get the user's job alerts.
+     */
+    public function jobAlerts()
+    {
+        return $this->hasMany(JobAlert::class);
     }
 
     /**

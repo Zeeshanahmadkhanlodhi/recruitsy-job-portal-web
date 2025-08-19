@@ -247,7 +247,37 @@ class PageController extends Controller
 
     public function jobAlerts()
     {
-        return view('pages.job-alerts');
+        $user = auth()->user();
+        
+        // Get user's job alerts
+        $jobAlerts = $user->jobAlerts()
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Calculate statistics
+        $activeAlerts = $jobAlerts->where('is_active', true)->count();
+        $last7DaysAlerts = $jobAlerts->where('created_at', '>=', now()->subDays(7))->count();
+        $appliedFromAlerts = $user->applications()
+            ->where('created_at', '>=', now()->subDays(30))
+            ->count();
+        
+        // Additional statistics
+        $totalAlerts = $jobAlerts->count();
+        $pausedAlerts = $jobAlerts->where('is_active', false)->count();
+        $recentAlerts = $jobAlerts->where('created_at', '>=', now()->subDays(30))->count();
+        
+        // Get active alerts for display
+        $activeJobAlerts = $jobAlerts->where('is_active', true);
+        
+        return view('pages.job-alerts', compact(
+            'activeAlerts',
+            'last7DaysAlerts', 
+            'appliedFromAlerts',
+            'activeJobAlerts',
+            'totalAlerts',
+            'pausedAlerts',
+            'recentAlerts'
+        ));
     }
 
     public function settings()

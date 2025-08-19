@@ -368,16 +368,7 @@
                         </label>
                     </div>
                     
-                    <div class="display-option">
-                        <div class="option-info">
-                            <h4 class="option-title">Compact View</h4>
-                            <p class="option-description">Show more content in less space</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
+
                 </div>
             </div>
 
@@ -385,8 +376,6 @@
                 <h3 class="section-title">Account Actions</h3>
                 
                 <div class="account-actions">
-                    <button class="btn btn-outline btn-sm">Export My Data</button>
-                    <button class="btn btn-outline btn-sm">Download Resume</button>
                     <button class="btn btn-outline btn-sm danger">Delete Account</button>
                 </div>
             </div>

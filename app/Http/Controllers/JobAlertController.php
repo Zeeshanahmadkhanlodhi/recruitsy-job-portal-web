@@ -18,14 +18,28 @@ class JobAlertController extends Controller
     {
         $data = $request->validate([
             'title' => ['nullable', 'string', 'max:255'],
-            'location' => ['nullable', 'string', 'max:255'],
+            'location' => ['nullable', 'string', 'max:100'],
             'job_type' => ['nullable', 'string', 'max:100'],
             'experience_level' => ['nullable', 'string', 'max:100'],
             'salary_range' => ['nullable', 'string', 'max:100'],
             'frequency' => ['required', 'in:daily,weekly,monthly'],
         ]);
-        $alert = JobAlert::create(array_merge($data, ['user_id' => Auth::id()]));
-        return response()->json(['status' => 'created', 'id' => $alert->id]);
+        
+        // Set default values for empty fields
+        $data = array_map(function($value) {
+            return $value === '' ? null : $value;
+        }, $data);
+        
+        $alert = JobAlert::create(array_merge($data, [
+            'user_id' => Auth::id(),
+            'is_active' => true
+        ]));
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Job alert created successfully',
+            'alert' => $alert
+        ]);
     }
 
     public function update(Request $request, string $id)
@@ -33,22 +47,36 @@ class JobAlertController extends Controller
         $alert = JobAlert::where('user_id', Auth::id())->findOrFail($id);
         $data = $request->validate([
             'title' => ['nullable', 'string', 'max:255'],
-            'location' => ['nullable', 'string', 'max:255'],
+            'location' => ['nullable', 'string', 'max:100'],
             'job_type' => ['nullable', 'string', 'max:100'],
             'experience_level' => ['nullable', 'string', 'max:100'],
             'salary_range' => ['nullable', 'string', 'max:100'],
             'frequency' => ['nullable', 'in:daily,weekly,monthly'],
             'is_active' => ['nullable', 'boolean'],
         ]);
+        
+        // Set default values for empty fields
+        $data = array_map(function($value) {
+            return $value === '' ? null : $value;
+        }, $data);
+        
         $alert->fill($data)->save();
-        return response()->json(['status' => 'updated']);
+        return response()->json([
+            'success' => true,
+            'status' => 'updated',
+            'message' => 'Job alert updated successfully'
+        ]);
     }
 
     public function destroy(string $id)
     {
         $alert = JobAlert::where('user_id', Auth::id())->findOrFail($id);
         $alert->delete();
-        return response()->json(['status' => 'deleted']);
+        return response()->json([
+            'success' => true,
+            'status' => 'deleted',
+            'message' => 'Job alert deleted successfully'
+        ]);
     }
 }
 

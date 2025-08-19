@@ -58,6 +58,7 @@ Route::post('/api/central-jobs/deactivate', [JobSyncController::class, 'deactiva
 
 // Candidate application forwarding
 Route::post('/api/jobs/{id}/apply', [ApplicationForwardController::class, 'apply']);
+Route::post('/api/applications/{id}/retry', [ApplicationForwardController::class, 'retry'])->middleware('auth');
 
 // Dashboard Routes (auth-only)
 Route::middleware('auth')->group(function () {
@@ -110,3 +111,6 @@ Route::prefix('api/profile')->middleware('auth')->group(function () {
     Route::get('/api/chat/conversations/{id}', [\App\Http\Controllers\ChatController::class, 'getMessages']);
     Route::post('/api/chat/conversations/{id}/messages', [\App\Http\Controllers\ChatController::class, 'sendMessage']);
 });
+
+// Include admin routes
+require __DIR__.'/admin.php';

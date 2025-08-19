@@ -27,7 +27,8 @@ class ApplicationForwardService
             $endpoint = rtrim($hrPlatformUrl, '/') . '/api/portal/jobs/' . ($job->external_id ?: $job->id) . '/apply';
             
             $payload = [
-                'name' => $application->candidate_name,
+                'first_name' => $this->extractFirstName($application->candidate_name),
+                'last_name' => $this->extractLastName($application->candidate_name),
                 'email' => $application->candidate_email,
                 'phone' => $application->candidate_phone,
                 'resume_url' => $application->resume_url,
@@ -94,6 +95,21 @@ class ApplicationForwardService
     {
         $payload = $apiKey . '|' . $timestamp;
         return hash_hmac('sha256', $payload, $apiSecret);
+    }
+
+    protected function extractFirstName(string $fullName): string
+    {
+        $nameParts = explode(' ', trim($fullName));
+        return $nameParts[0] ?? '';
+    }
+
+    protected function extractLastName(string $fullName): string
+    {
+        $nameParts = explode(' ', trim($fullName));
+        if (count($nameParts) <= 1) {
+            return '';
+        }
+        return implode(' ', array_slice($nameParts, 1));
     }
 
     protected function markAsSuccess(Application $application, array $response): void

@@ -15,34 +15,24 @@
             </div>
             <div class="overview-content">
                 <h3 class="overview-title">Active Alerts</h3>
-                <span class="overview-number">5</span>
+                <span class="overview-number">{{ $activeAlerts }}</span>
             </div>
         </div>
         
         <div class="overview-card">
             <div class="overview-icon">
                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                 </svg>
             </div>
             <div class="overview-content">
-                <h3 class="overview-title">Last 7 Days</h3>
-                <span class="overview-number">12</span>
-            </div>
-        </div>
-        
-        <div class="overview-card">
-            <div class="overview-icon">
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <div class="overview-content">
-                <h3 class="overview-title">Applied</h3>
-                <span class="overview-number">3</span>
+                <h3 class="overview-title">Total Alerts</h3>
+                <span class="overview-number">{{ $totalAlerts }}</span>
             </div>
         </div>
     </div>
+
+
 
     <!-- Create New Alert -->
     <div class="create-alert-section">
@@ -113,75 +103,69 @@
         </form>
     </div>
 
+
+
     <!-- Active Alerts -->
-    <div class="active-alerts-section">
         <div class="section-header">
             <h3 class="section-title">Active Job Alerts</h3>
         </div>
         
         <div class="alerts-list" id="alerts-list">
-            <div class="alert-card" id="alerts-empty" style="display:none;">
-                <div class="alert-header">
-                    <div class="alert-info"><h4 class="alert-title">No alerts yet</h4><p class="alert-location">Create your first alert above</p></div>
+            @if($activeJobAlerts->count() > 0)
+                @foreach($activeJobAlerts as $alert)
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <div class="alert-info">
+                                <h4 class="alert-title">{{ $alert->title ?: 'All Jobs' }}</h4>
+                                <p class="alert-location">
+                                    @if($alert->location)
+                                        {{ $alert->location }}
+                                    @else
+                                        Any Location
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="alert-actions">
+                                <button class="btn btn-outline btn-sm" onclick="editAlert({{ $alert->id }})">Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteAlert({{ $alert->id }})">Delete</button>
+                            </div>
+                        </div>
+                        <div class="alert-details">
+                            <div class="alert-meta">
+                                @if($alert->job_type)
+                                    <span class="meta-tag">{{ ucfirst($alert->job_type) }}</span>
+                                @endif
+                                @if($alert->experience_level)
+                                    <span class="meta-tag">{{ ucfirst($alert->experience_level) }}</span>
+                                @endif
+                                @if($alert->salary_range)
+                                    <span class="meta-tag">{{ $alert->salary_range }}</span>
+                                @endif
+                                <span class="meta-tag">{{ ucfirst($alert->frequency) }}</span>
+                            </div>
+                            <div class="alert-status">
+                                <span class="status-badge status-active">Active</span>
+                                @if($alert->last_sent_at)
+                                    <small class="last-sent">Last sent: {{ $alert->last_sent_at->diffForHumans() }}</small>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @else
+                <div class="alert-card" id="alerts-empty">
+                    <div class="alert-header">
+                        <div class="alert-info">
+                            <h4 class="alert-title">No alerts yet</h4>
+                            <p class="alert-location">Create your first alert above</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 
-    <!-- Notification Settings -->
-    <div class="notification-settings-section">
-        <div class="section-header">
-            <h3 class="section-title">Notification Settings</h3>
-        </div>
-        
-        <div class="settings-content">
-            <div class="setting-group">
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4 class="setting-title">Email Notifications</h4>
-                        <p class="setting-description">Receive job alerts via email</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4 class="setting-title">Push Notifications</h4>
-                        <p class="setting-description">Receive notifications in your browser</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4 class="setting-title">Application Updates</h4>
-                        <p class="setting-description">Get notified about application status changes</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                
-                <div class="setting-item">
-                    <div class="setting-info">
-                        <h4 class="setting-title">Weekly Summary</h4>
-                        <p class="setting-description">Receive a weekly summary of job opportunities</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </div>
 
 <style>
@@ -193,10 +177,16 @@
 /* Alerts Overview */
 .alerts-overview {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
+
+
+
+
+
+
 
 .overview-card {
     background: white;
@@ -433,93 +423,98 @@
     flex-wrap: wrap;
 }
 
-/* Notification Settings */
-.notification-settings-section {
+
+
+/* Alert Card Styles */
+.alert-card {
     background: white;
     border-radius: 0.75rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
-
-.settings-content {
     padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
 }
 
-.setting-group {
+.alert-header {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
 }
 
-.setting-item {
+.alert-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.alert-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.alert-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.alert-details {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
+    margin-bottom: 1rem;
 }
 
-.setting-info {
-    flex: 1;
+.alert-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
-.setting-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 0.25rem;
+.meta-tag {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
-.setting-description {
-    font-size: 0.875rem;
+.alert-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.last-sent {
     color: #6b7280;
+    font-size: 0.75rem;
 }
 
-/* Toggle Switch */
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
+.btn-danger {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
 }
 
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 24px;
-}
-
-.toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .toggle-slider {
-    background-color: #2563eb;
-}
-
-input:checked + .toggle-slider:before {
-    transform: translateX(26px);
+.btn-danger:hover {
+    background: #dc2626;
+    border-color: #dc2626;
 }
 
 /* Responsive Design */
@@ -527,6 +522,10 @@ input:checked + .toggle-slider:before {
     .alerts-overview {
         grid-template-columns: 1fr;
     }
+    
+
+    
+
     
     .form-grid {
         grid-template-columns: 1fr;
@@ -559,109 +558,146 @@ input:checked + .toggle-slider:before {
         width: 100%;
     }
     
-    .setting-item {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-    
-    .toggle-switch {
-        align-self: flex-end;
+
+}
+
+@media (max-width: 480px) {
+    .overview-card {
+        padding: 1rem;
     }
 }
 </style>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    // Global functions for alert actions
+    function editAlert(alertId) {
+        // Simple inline edit for frequency
+        const newFreq = prompt('Enter new frequency (daily, weekly, monthly):', 'daily');
+        if (!newFreq || !['daily', 'weekly', 'monthly'].includes(newFreq)) {
+            return;
+        }
+        
+        fetch(`/api/job-alerts/${alertId}`, {
+            method: 'PUT',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                frequency: newFreq
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success || data.status === 'updated') {
+                alert('Alert updated successfully!');
+                window.location.reload();
+            } else {
+                alert('Failed to update alert: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Update error:', error);
+            alert('An error occurred while updating the alert');
+        });
+    }
+
+    function deleteAlert(alertId) {
+        if (confirm('Are you sure you want to delete this job alert?')) {
+            fetch(`/api/job-alerts/${alertId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success || data.status === 'deleted') {
+                    // Reload the page to refresh the data
+                    window.location.reload();
+                } else {
+                    alert('Failed to delete alert: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Delete error:', error);
+                alert('An error occurred while deleting the alert');
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('create-alert-form');
     const alertsList = document.getElementById('alerts-list');
     const empty = document.getElementById('alerts-empty');
 
-    function renderAlertItem(a) {
-        const activeClass = a.is_active ? 'active' : 'paused';
-        const activeText = a.is_active ? 'Active' : 'Paused';
-        return `
-        <div class="alert-card" data-id="${a.id}">
-            <div class="alert-header">
-                <div class="alert-info">
-                    <h4 class="alert-title">${a.title || 'Any role'}</h4>
-                    <p class="alert-location">${a.location || ''}</p>
-                    <div class="alert-meta">
-                        ${a.job_type ? `<span class="meta-item">${a.job_type}</span>` : ''}
-                        ${a.experience_level ? `<span class="meta-item">${a.experience_level}</span>` : ''}
-                        ${a.salary_range ? `<span class="meta-item">${a.salary_range}</span>` : ''}
-                    </div>
-                </div>
-                <div class="alert-status ${activeClass}">
-                    <span class="status-dot"></span>
-                    <span class="status-text">${activeText}</span>
-                </div>
-            </div>
-            <div class="alert-details">
-                <div class="detail-item"><span class="detail-label">Frequency:</span><span class="detail-value">${a.frequency}</span></div>
-                ${a.last_sent_at ? `<div class="detail-item"><span class="detail-label">Last Sent:</span><span class="detail-value">${new Date(a.last_sent_at).toLocaleString()}</span></div>` : ''}
-            </div>
-            <div class="alert-actions">
-                <button class="btn btn-sm btn-outline btn-edit">Edit</button>
-                <button class="btn btn-sm btn-outline btn-toggle">${a.is_active ? 'Pause' : 'Resume'}</button>
-                <button class="btn btn-sm btn-outline btn-delete">Delete</button>
-            </div>
-        </div>`;
-    }
-
-    async function loadAlerts() {
-        const res = await window.axios.get('/api/job-alerts');
-        const data = res.data || {};
-        const items = Array.isArray(data.data) ? data.data : [];
-        alertsList.innerHTML = '';
-        if (items.length === 0) {
-            empty.style.display = '';
-            alertsList.appendChild(empty);
-            return;
-        }
-        empty.style.display = 'none';
-        alertsList.insertAdjacentHTML('beforeend', items.map(renderAlertItem).join(''));
-    }
+    // For demo purposes, we'll just show the existing alerts from the database
+    // The loadAlerts function is not needed since we're using server-side rendering
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        const payload = {
-            title: document.getElementById('job-title').value,
-            location: document.getElementById('location').value,
-            job_type: document.getElementById('job-type').value,
-            experience_level: document.getElementById('experience-level').value,
-            salary_range: document.getElementById('salary-range').value,
-            frequency: document.getElementById('frequency').value || 'daily',
-        };
+        
+        // Get form values
+        const title = document.getElementById('job-title').value;
+        const location = document.getElementById('location').value;
+        const jobType = document.getElementById('job-type').value;
+        const experienceLevel = document.getElementById('experience-level').value;
+        const salaryRange = document.getElementById('salary-range').value;
+        const frequency = document.getElementById('frequency').value || 'daily';
+        
+        // Basic validation
+        if (!title && !location && !jobType && !experienceLevel && !salaryRange) {
+            alert('Please fill in at least one field to create a job alert.');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Creating...';
+        submitBtn.disabled = true;
+        
         try {
-            await window.axios.post('/api/job-alerts', payload);
-            await loadAlerts();
-            form.reset();
-        } catch (err) {
-            alert('Failed to create alert');
+            // Send data to backend
+            const response = await fetch('/api/job-alerts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({
+                    title: title || null,
+                    location: location || null,
+                    job_type: jobType || null,
+                    experience_level: experienceLevel || null,
+                    salary_range: salaryRange || null,
+                    frequency: frequency
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                // Success - show message and reload page to display new alert
+                alert('Job alert created successfully!');
+                window.location.reload();
+            } else {
+                // Error from backend
+                alert('Failed to create job alert: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            // Network or other error
+            console.error('Error creating job alert:', error);
+            alert('An error occurred while creating the job alert. Please try again.');
+        } finally {
+            // Reset button state
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
         }
     });
 
-    document.addEventListener('click', async function(e) {
-        const card = e.target.closest('.alert-card');
-        if (!card) return;
-        const id = card.getAttribute('data-id');
-        if (e.target.closest('.btn-delete')) {
-            await window.axios.delete(`/api/job-alerts/${id}`);
-            await loadAlerts();
-        } else if (e.target.closest('.btn-toggle')) {
-            const isActive = card.querySelector('.status-text')?.textContent === 'Active';
-            await window.axios.put(`/api/job-alerts/${id}`, { is_active: !isActive });
-            await loadAlerts();
-        } else if (e.target.closest('.btn-edit')) {
-            // Simple inline edit (toggle active and change frequency for demo)
-            const newFreq = prompt('Frequency (daily, weekly, monthly):', 'daily');
-            if (!newFreq) return;
-            await window.axios.put(`/api/job-alerts/${id}`, { frequency: newFreq });
-            await loadAlerts();
-        }
-    });
-
-    loadAlerts();
+    // TODO: Implement edit/delete functionality when backend is ready
+    // For now, these buttons will show "coming soon" messages
 });
 </script>
 @endsection 
